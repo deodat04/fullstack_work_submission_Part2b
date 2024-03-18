@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'
+import listPerson from './services/phonebook'
 
 const Filter = ({ filter, handleFilterChange }) => {
   return (
@@ -43,17 +43,16 @@ const Persons = ({ persons, filter }) => {
 
 const App = () => {
   const [persons, setPersons] = useState([]);
-
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
 
 useEffect( () => {
-  axios
-  .get('http://localhost:3001/persons')
-  .then(response => {
-    setPersons(response.data)
-  })
+  listPerson
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
+      })
 }, [])
 
   const handleNameChange = (event) => {
@@ -80,9 +79,13 @@ useEffect( () => {
       date: new Date().toISOString(),
     };
 
-    setPersons(persons.concat(personObject));
-    setNewName('');
-    setNewNumber('');
+    listPerson
+    .create(personObject)
+    .then(returnedPersons => {
+      setPersons(persons.concat(returnedPersons))
+      setNewName('')
+      setNewNumber('')
+    })
   };
 
   return (
