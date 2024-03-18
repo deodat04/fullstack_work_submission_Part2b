@@ -26,18 +26,26 @@ const PersonForm = ({ newName, newNumber, handleNameChange, handleNumberChange, 
     </form>
   );
 };
+ 
 
-const Persons = ({ persons, filter }) => {
+const Persons = ({ persons, filter, deletePerson }) => {
+
   const filteredPersons = persons.filter(person =>
     person.name.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
+    <div>
     <ul>
       {filteredPersons.map(person =>
-        <li key={person.name}>{person.name} {person.number}</li>
-      )}
+        <li key={person.name}>
+          {person.name} {person.number}
+          <button onClick={() => deletePerson(person)}>delete</button>
+        </li>
+      )}   
     </ul>
+
+    </div>
   );
 };
 
@@ -46,6 +54,7 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+
 
 useEffect( () => {
   listPerson
@@ -79,7 +88,7 @@ useEffect( () => {
       date: new Date().toISOString(),
     };
 
-    listPerson
+    listPerson  
     .create(personObject)
     .then(returnedPersons => {
       setPersons(persons.concat(returnedPersons))
@@ -87,6 +96,20 @@ useEffect( () => {
       setNewNumber('')
     })
   };
+
+  const deletePerson = personToDelete => {
+    if (window.confirm(`Delete ${personToDelete.name} ?`)) {
+      listPerson
+        .remove(personToDelete.id)
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== personToDelete.id));
+        })
+        .catch(error => {
+          console.error('Error deleting person:', error);
+        });
+    }
+  };
+  
 
   return (
     <div>
@@ -106,7 +129,7 @@ useEffect( () => {
 
       <h3>Numbers</h3>
 
-      <Persons persons={persons} filter={filter} />
+      <Persons persons={persons} filter={filter} deletePerson={deletePerson} />
     </div>
   );
 };
