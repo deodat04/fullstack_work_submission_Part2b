@@ -115,7 +115,10 @@ const App = () => {
     }
 
     if (persons.find((person) => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
+      setNotificationMessage(`${newName} is already added to phonebook.`);
+      setTimeout(() => {
+        setNotificationMessage(null);
+      }, 5000);
       return;
     }
     const personObject = {
